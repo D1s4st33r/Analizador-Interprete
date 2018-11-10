@@ -13,7 +13,7 @@ let listVar = [];				//array que almacena las variables en forma de objeto
 let varsToMake = [];
 let parOpen = [];			  //array de banderas para verificar el cerrado correcto de parentesis
 let keyOpen = [];			  //array de banderas para verificar el cerrado correcto de llaves	
-let pilaCases = []			     //array que sera tratado como pila de casos
+let pilaCases = []			     //array que sera tratado como pila de pilaCases
 
 //funcion para crear un objeto del caso
 let makeObjCase = (nameCase, struct, flags, complete = false) => {
@@ -22,7 +22,7 @@ let makeObjCase = (nameCase, struct, flags, complete = false) => {
 		nameCase,
 		struct,				//almacena la estuctura de una sintaxis	
 		flags,					// un array  de booleanos que su numero dependera de la sintaxis que se este validando
-		varInUse=[] ,			    //determina la variable en uso
+		varInUse:[] ,			    //determina la variable en uso
 		result:0,			//determina los valores actuales y los resultados finales 
 		complete
 	};
@@ -58,18 +58,30 @@ const insertVar = () => {
 	});
 };
 
-const makeVar = (name,type,value) => {
-	getVars();
-	let varaible = {
+const varsToMake = (name,type,value) => {
+	let variable = {
 		 name,
 		 type,
 		 value
 	};
 
-	listVar.push(varaible);
-	insertVar();
+	varsToMake.push(variable);
 	return tarea;
 }
+
+
+// const makeVar = (name,type,value) => {
+// 	getVars();
+// 	let varaible = {
+// 		 name,
+// 		 type,
+// 		 value
+// 	};
+
+// 	listVar.push(varaible);
+// 	insertVar();
+// 	return tarea;
+// }
 
 
 // const addValueVar = (value,lastElement,lastSecondElement) => {
@@ -94,34 +106,34 @@ const performer = {
 
 		switch (element) {
 			case 'bucleFor':
-				casos.push(makeObjCase(element,syntax.for,makeFlags(syntax.for.length)))
+				pilaCases.push(makeObjCase(element,syntax.for,makeFlags(syntax.for.length)))
 				break;
 			case 'bucleWhile':
-				casos.push(makeObjCase(element,syntax.while,makeFlags(syntax.while.length)))
+				pilaCases.push(makeObjCase(element,syntax.while,makeFlags(syntax.while.length)))
 				break;
 			case 'condition':
-				casos.push(makeObjCase(element,syntax.if,makeFlags(syntax.if.length)))
+				pilaCases.push(makeObjCase(element,syntax.if,makeFlags(syntax.if.length)))
 				break;
 			case 'end':
-				casos.push(makeObjCase(element,syntax.end,makeFlags(syntax.end.length)))
+				pilaCases.push(makeObjCase(element,syntax.end,makeFlags(syntax.end.length)))
 				break;
 			case 'funcion':
-				casos.push(makeObjCase(element,syntax.accion,makeFlags(syntax.accion.length)))
+				pilaCases.push(makeObjCase(element,syntax.accion,makeFlags(syntax.accion.length)))
 				break;
 			case 'ini':
-				casos.push(makeObjCase(element,syntax.ini,makeFlags(syntax.ini.length)))
+				pilaCases.push(makeObjCase(element,syntax.ini,makeFlags(syntax.ini.length)))
 				break;
 			case 'like':
-				casos.push(makeObjCase(element,syntax.def,makeFlags(syntax.def.length)))
+				pilaCases.push(makeObjCase(element,syntax.def,makeFlags(syntax.def.length)))
 				break;
 			case 'read':
-				casos.push(makeObjCase(element,syntax.read,makeFlags(syntax.read.length)))
+				pilaCases.push(makeObjCase(element,syntax.read,makeFlags(syntax.read.length)))
 				break;
 			case 'retorna':
-				casos.push(makeObjCase(element,syntax.retorna,makeFlags(syntax.retorna.length)))
+				pilaCases.push(makeObjCase(element,syntax.retorna,makeFlags(syntax.retorna.length)))
 				break;
 			case 'show':
-				casos.push(makeObjCase(element,syntax.show,makeFlags(syntax.show.length)))
+				pilaCases.push(makeObjCase(element,syntax.show,makeFlags(syntax.show.length)))
 				break;
 			default:
 				//console.log('no debia aparecer : ' + element);
@@ -182,17 +194,16 @@ const performer = {
 		let regEx = new RegExp('\\bnum\\b|decimal|texto|vof|array');
 
 		if (lastElement.match(regEx) && lastSecondElement=='como' || varsToMake.length>0) {
-			varsToMake.push(element);
+			varsToMake(element,lastElement);
 			return 0;
 		}
-
 	
 		let vars=getVars();
 		
 		for (let varaible of vars) {
 
 			if (varaible.name == element) {
-				varInUse = element;
+				//varInUse = element;
 				return 0;
 			}
 		}

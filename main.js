@@ -26,15 +26,19 @@ while (numLine<numLines) {
 	tokens.forEach(token => {
 		
 		if (rWord = analyzer.isRWord(token)) {
+			lastSecondToken = lastToken;
 			lastToken = token;
 			performer.wordCase(rWord);
 		}
 		else if (rChar = analyzer.isRChar(token)) {
+			lastSecondToken = lastToken;
 			lastToken = token;
 			performer.charCase(rChar);
 		}
 		else if (analyzer.isVar(token)) {
-			
+			lastSecondToken = lastToken;
+			lastToken = token;
+			performer.varCase(token,lastToken,lastSecondToken,numLine);
 		}
 	
 	});
