@@ -17,7 +17,7 @@ const analyzer = {
 				return key;
 			}
 		}
-		return "";
+		return false;
 	},
 
 	//funcion para validar si un token que es caracter  reservado
@@ -28,7 +28,7 @@ const analyzer = {
 				return key;
 			}
 		}
-		return "";
+		return false;
 	},
 
 	isVar: (element) => {

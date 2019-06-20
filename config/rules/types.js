@@ -9,7 +9,8 @@ const types = {
         num: `\\b${descrip.num}+\\b`,
         decimal: `\\b${descrip.num}+\\.${descrip.num}+\\b`,
         texto: `\\b".*"\\b|\\b'.*'\\b`,
-        vof: 'verdadero|falso'
+        vof: 'verdadero|falso',
+        operation: `[\\+\\*/-%]|${this.name}|${this.num}|${this.decimal}|!`,
 };
 
 module.exports = {

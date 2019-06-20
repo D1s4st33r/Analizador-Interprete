@@ -8,32 +8,44 @@ const syntax = require('../config/rules/syntax').syntax;
 let iniIsFirst= false;			 //bandera para la estructura general, palabra reservada ini
 let termiIsLast = false;		    //bandera para la estrucura general, palabra reservada 
 let errores = [];				// array que almacena los errores en un objeto individual
-let first = true;				//bandera, determina que es la primera linea con codigo
+let first = true;				//bandera, determina que es la primera linea de codigo
 let listVar = [];				//array que almacena las variables en forma de objeto
-let varsToMake = [];
+let type = '';					//el tipo define que reglas son, de palabra reservada, caracter o variable
+let varsToMake = [];			//array que almacena las variables a crear
 let parOpen = [];			  //array de banderas para verificar el cerrado correcto de parentesis
 let keyOpen = [];			  //array de banderas para verificar el cerrado correcto de llaves	
-let pilaCases = []			     //array que sera tratado como pila de pilaCases
+let pilaCases = [];			   //array que sera tratado como pila de de los casos
+let lastCase = 0;
+
 
 //funcion para crear un objeto del caso
-let makeObjCase = (nameCase, struct, flags, complete = false) => {
+const makeObjCase = (nameCase, struct, flags) => {
 	
 	let object = {
 		nameCase,
 		struct,				//almacena la estuctura de una sintaxis	
 		flags,					// un array  de booleanos que su numero dependera de la sintaxis que se este validando
+		numFlag: 0,				//varaible centinela que llevara el numero de banderas para recorrerlo
+		limit:flags.length,		//variable que alamecena el numero limite de bandera
 		varInUse:[] ,			    //determina la variable en uso
-		result:0,			//determina los valores actuales y los resultados finales 
-		complete
+		result: 0,			//determina los valores actuales y los resultados finales 
 	};
-	
-	console.log(object);
-	console.log('\n');
+	//console.log(object);
+	//console.log('\n');
 	return object;
 }
 
+const checkCase = (last) => {
+	pilaCases[last].flags.forEach(element => {
+		if (!element) {
+			return false;
+		}
+	});
+	return true;
+}
+
 //funcion para crear el numero de bandera, esto depende de la estructura del caso
-makeFlags = (num) => {	
+const makeFlags = (num) => {	
 	let array = [];
 	for (let index = 0; index < num; index++) {
 		array.push(false);
@@ -41,50 +53,29 @@ makeFlags = (num) => {
 	return array;
 };
 
-//funcion para regresar una lista de las variables guardadas
-const getVars = () => {
-	try {
-		listVar = require('../data/var.json');
-	} catch{
-		listVar = [];
-	}
-	return listVar;
-};
-
-const insertVar = () => {
-	let data = JSON.stringify(listVar);
-	fs.writeFile('../data/var.json', data, (err) => {
-		if (err) throw new Error('No se pudo grabar');
-	});
-};
-
-const varsToMake = (name,type,value) => {
+const prepareVars = (name,type) => {
 	let variable = {
 		 name,
 		 type,
-		 value
+		//  value
 	};
 
 	varsToMake.push(variable);
-	return tarea;
+	// return tarea;
 }
 
 
-// const makeVar = (name,type,value) => {
-// 	getVars();
-// 	let varaible = {
-// 		 name,
-// 		 type,
-// 		 value
-// 	};
+const makeVars = (vars) => {
 
-// 	listVar.push(varaible);
-// 	insertVar();
-// 	return tarea;
-// }
+	vars.forEach(element => {
+		listVar.push(element);
+		insertVar();
+		// return tarea;
+	});
+}
 
 
-// const addValueVar = (value,lastElement,lastSecondElement) => {
+// const addValueVar = (value,lastToken,lastSecondToken) => {
 // 	get_db();
 // 	let id_tarea = lista_tareas.findIndex(tarea => tarea.descripcion === descripcion)
 
@@ -102,45 +93,46 @@ const varsToMake = (name,type,value) => {
 const performer = {
 	
 	// funcion para determinar la sintaxis que se validara dependiendo de la palabra reservada encontrada
-	wordCase: (element) => {
+	wordCase: (caso) => {
 
-		switch (element) {
+		switch (caso) {
 			case 'bucleFor':
-				pilaCases.push(makeObjCase(element,syntax.for,makeFlags(syntax.for.length)))
+				pilaCases.push(makeObjCase(caso,syntax.for,makeFlags(syntax.for.length)))
 				break;
 			case 'bucleWhile':
-				pilaCases.push(makeObjCase(element,syntax.while,makeFlags(syntax.while.length)))
+				pilaCases.push(makeObjCase(caso,syntax.while,makeFlags(syntax.while.length)))
 				break;
 			case 'condition':
-				pilaCases.push(makeObjCase(element,syntax.if,makeFlags(syntax.if.length)))
+				pilaCases.push(makeObjCase(caso,syntax.if,makeFlags(syntax.if.length)))
 				break;
 			case 'end':
-				pilaCases.push(makeObjCase(element,syntax.end,makeFlags(syntax.end.length)))
+				pilaCases.push(makeObjCase(caso,syntax.end,makeFlags(syntax.end.length)))
 				break;
 			case 'funcion':
-				pilaCases.push(makeObjCase(element,syntax.accion,makeFlags(syntax.accion.length)))
+				pilaCases.push(makeObjCase(caso,syntax.accion,makeFlags(syntax.accion.length)))
 				break;
 			case 'ini':
-				pilaCases.push(makeObjCase(element,syntax.ini,makeFlags(syntax.ini.length)))
+				pilaCases.push(makeObjCase(caso,syntax.ini,makeFlags(syntax.ini.length)))
 				break;
 			case 'like':
-				pilaCases.push(makeObjCase(element,syntax.def,makeFlags(syntax.def.length)))
+				pilaCases.push(makeObjCase(caso,syntax.def,makeFlags(syntax.def.length)))
 				break;
 			case 'read':
-				pilaCases.push(makeObjCase(element,syntax.read,makeFlags(syntax.read.length)))
+				pilaCases.push(makeObjCase(caso,syntax.read,makeFlags(syntax.read.length)))
 				break;
 			case 'retorna':
-				pilaCases.push(makeObjCase(element,syntax.retorna,makeFlags(syntax.retorna.length)))
+				pilaCases.push(makeObjCase(caso,syntax.retorna,makeFlags(syntax.retorna.length)))
 				break;
 			case 'show':
-				pilaCases.push(makeObjCase(element,syntax.show,makeFlags(syntax.show.length)))
+				pilaCases.push(makeObjCase(caso,syntax.show,makeFlags(syntax.show.length)))
 				break;
 			default:
-				//console.log('no debia aparecer : ' + element);
+				console.log('no debia aparecer : ' + caso);
 				break;	
 		}
-		
-		if (first && element == 'ini') {
+		//console.log(pilaCases);
+		// pilaCases=[]
+		if (first && caso == 'ini') {
 			iniIsFirst = true;
 		}
 		else {
@@ -148,35 +140,35 @@ const performer = {
 		}
 	},
 	// funcion para determinar la sintaxis que se validara dependiendo de la palabra reservada encontrada
-	charCase: (element) => {
+	isChar: (caso) => {
 		
-		switch (element) {
+		switch (caso) {
 			case 'fin':
-				console.log('soy !');
+				//console.log('soy !');
 				break;
 			case 'as':
-				console.log('soy -');
+				//console.log('soy -');
 				break;
 			case 'sig':
-				console.log('soy >');
+				//console.log('soy >');
 				break;
 			case 'leftKey':
-				console.log('soy {');
+				//console.log('soy {');
 				break;
 			case 'rightKey':
-				console.log('soy }');
+				//console.log('soy }');
 				break;
 			case 'leftPar':
-				console.log('soy (');
+				//console.log('soy (');
 				break;
 			case 'rightPar':
-				console.log('soy )');
+				//console.log('soy )');
 				break;
 			case 'com':
-				console.log('soy "');
+				//console.log('soy "');
 				break;
 			case 'comSim':
-				console.log("soy '");
+				//console.log("soy '");
 				break;
 			default:
 				console.log('mmmta :v');
@@ -189,31 +181,103 @@ const performer = {
 	},
 
 	// funcion para manejar la variable, si se esta declarando o si se esta usando y su manejo de errores
-	varCase: (element, lastElement,lastSecondElement, line) => {
+	varCase: (token, lastToken, line) => {
 
 		let regEx = new RegExp('\\bnum\\b|decimal|texto|vof|array');
+		listVar.forEach(variable => {
+			if (variable.name == token&&pilaCases.length>0) {
+				pilaCases[lastCase].varInUse.push(variable)
+			}	
+		});
 
-		if (lastElement.match(regEx) && lastSecondElement=='como' || varsToMake.length>0) {
-			varsToMake(element,lastElement);
-			return 0;
-		}
-	
-		let vars=getVars();
-		
-		for (let varaible of vars) {
+		if(lastToken.match(regEx)){type=lastToken}
 
-			if (varaible.name == element) {
-				//varInUse = element;
-				return 0;
-			}
+		if (pilaCases.length>0&& pilaCases[lastCase].nameCase=='like') {
+			prepareVars(token, type);
 		}
 		
 		errores.push({
 			tipo: 'undefined',
-			message: `la variable ${element} no se ha definido`,
+			message: `la variable ${token} no se ha definido`,
 			line
 		});
+
+		if (first) {
+			first = false;
+		}
 	},
+
+	//metodo que se encargara de ejecutar el codigo interpretado anteriormente por esta misma clase
+	validate: (token,type,line) => {
+		
+		if (pilaCases.length>0) {
+			lastCase = pilaCases.length - 1;
+			console.log("\n");
+			// console.log(pilaCases);
+			if (token.match(new RegExp(pilaCases[lastCase].struct[pilaCases[lastCase].numFlag]))) {
+				pilaCases[lastCase].flags[pilaCases[lastCase].numFlag] = true;
+			}
+			else {
+				console.log(`no se encuentra el elemento ${pilaCases[lastCase].struct[pilaCases[lastCase].numFlag]} en la linea : ${line}`);
+			}
+			if (pilaCases[lastCase].numFlag < pilaCases[lastCase].limit) { pilaCases[lastCase].numFlag++; }
+			console.log('::::::::::::::::::::::::' + token);
+			console.log(pilaCases[lastCase]);
+			console.log("//////////////////////////////////////////////////////////////////////////////");
+
+		}
+	},
+	
+	status: () => {
+
+		
+		if (pilaCases[lastCase].numFlag == pilaCases[lastCase].limit) {
+				
+			if (checkCase(lastCase)) {
+				return true;
+			} 
+			console.log(`PRUEBA: ${pilaCases[lastCase]}`);
+		}
+		return false;
+	},
+
+	eject: () => {
+		switch (pilaCases[lastCase].name) {
+			case 'bucleFor':
+				// for(pilaCases[lastCase])
+				break;
+			case 'bucleWhile':
+				pilaCases.push(makeObjCase(caso,syntax.while,makeFlags(syntax.while.length)))
+				break;
+			case 'condition':
+				pilaCases.push(makeObjCase(caso,syntax.if,makeFlags(syntax.if.length)))
+				break;
+			case 'end':
+				pilaCases.push(makeObjCase(caso,syntax.end,makeFlags(syntax.end.length)))
+				break;
+			case 'funcion':
+				pilaCases.push(makeObjCase(caso,syntax.accion,makeFlags(syntax.accion.length)))
+				break;
+			case 'ini':
+				pilaCases.push(makeObjCase(caso,syntax.ini,makeFlags(syntax.ini.length)))
+				break;
+			case 'like':
+				pilaCases.push(makeObjCase(caso,syntax.def,makeFlags(syntax.def.length)))
+				break;
+			case 'read':
+				pilaCases.push(makeObjCase(caso,syntax.read,makeFlags(syntax.read.length)))
+				break;
+			case 'retorna':
+				pilaCases.push(makeObjCase(caso,syntax.retorna,makeFlags(syntax.retorna.length)))
+				break;
+			case 'show':
+				pilaCases.push(makeObjCase(caso,syntax.show,makeFlags(syntax.show.length)))
+				break;
+			default:
+				//console.log('no debia aparecer : ' + caso);
+				break;	
+		}
+	}
 
 };
 

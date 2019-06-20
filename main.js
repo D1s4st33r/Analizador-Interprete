@@ -13,34 +13,48 @@ file.read(argv.file);
 let contentArray = file.getContentArray();
 let numLines = contentArray.length;
 let numLine = 0;
+let caso = {};
 let tokens = [];
 let lastToken = '';
-let lastSecondToken = '';
+let type = '';
 let rWord = '';
 let rChar = '';
 
-while (numLine<numLines) {
-	
+while (numLine < numLines) {
+
 	tokens = contentArray[numLine].toString().match(tokenizer);
-	//console.log(tokens);
+	// console.log(tokens);
 	tokens.forEach(token => {
-		
-		if (rWord = analyzer.isRWord(token)) {
-			lastSecondToken = lastToken;
-			lastToken = token;
-			performer.wordCase(rWord);
+
+		if (token != "" && token != " ") {
+
+			if (rWord = analyzer.isRWord(token)) {
+				lastSecondToken = lastToken;
+				lastToken = token;
+				type = 'rword';
+				performer.wordCase(rWord);
+			}
+			else if (rChar = analyzer.isRChar(token)) {
+				lastSecondToken = lastToken;
+				lastToken = token;
+				type = 'rchar';
+				performer.isChar(rChar);
+			}
+			else if (analyzer.isVar(token)) {
+				lastSecondToken = lastToken;
+				lastToken = token;
+				type = 'var';
+				performer.varCase(token, lastToken, lastSecondToken, numLine);
+			}
+
+			performer.validate(token, type, numLine);
+
+			if (performer.status()) {
+				// performer.eject();
+			}
 		}
-		else if (rChar = analyzer.isRChar(token)) {
-			lastSecondToken = lastToken;
-			lastToken = token;
-			performer.charCase(rChar);
-		}
-		else if (analyzer.isVar(token)) {
-			lastSecondToken = lastToken;
-			lastToken = token;
-			performer.varCase(token,lastToken,lastSecondToken,numLine);
-		}
-	
+
+
 	});
 	numLine++;
 }

@@ -1,8 +1,8 @@
 Ini<
 
-como array numeros!
-como num edad!
-como text nombre, apellido!
+como array #$!
+como num fer !
+como text nombre!
 como vof mayor!
 
 nombre -> oye("ingresa tu nombre")!
@@ -28,4 +28,4 @@ muestra("no ingresaste los datos bye")!
 
 accion saludar->(name){ muestra("hola "+nombre+", eres mayor de edad")!}
 
->Termi
+
