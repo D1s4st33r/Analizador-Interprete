@@ -4,7 +4,7 @@
 const fs = require('fs');
 
 const manager = {
-	path: '', 
+	path: '', //guarda la path (relativa o directa) del archivo a analizar
 	content: '', //guarda todo el contenido en un String
 	lines:[], // recibe un arreglo de todas las lineas del archivo
 	read: (path) => {
@@ -17,6 +17,4 @@ const manager = {
 	getPath: ()=> this.path
 }
 
-module.exports = {
-	manager
-};
+module.exports = manager;

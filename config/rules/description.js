@@ -1,9 +1,7 @@
 /**
  *  Configuracion de los caracteres permitidos para el lenguaje "SIMPLE"
- *  lacconfiguracion esta realizada con expresiones regulares-comunes
+ *  lacconfiguracion esta realizada con expresiones regulares
  */
-
-
 const rules = {
         alp: '[A-Za-z]',
         num: '[0-9]',
@@ -12,6 +10,4 @@ const rules = {
         log: '[+-*/%]',
 };
 
-module.exports = {
-        rules
-};
+module.exports = rules;

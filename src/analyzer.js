@@ -41,6 +41,4 @@ const analyzer = {
 };
 
 
-module.exports = {
-	analyzer
-};
+module.exports = analyzer;

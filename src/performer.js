@@ -281,6 +281,4 @@ const performer = {
 
 };
 
-module.exports = {
-	performer
-}
+module.exports = performer;

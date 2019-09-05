@@ -4,14 +4,14 @@
  */
 
 const word = {
-        type: '\\bnum\\b|decimal|texto|vof|array',
-        condition: 'correcto|incorrecto|sino',
-        bucleFor: 'recorre',
-        for: 'hasta',
-        bucleWhile:'mientras',
-        show: 'muestra',
-        read: 'oye',
-        this: 'este',
+        types: '\\bnum\\b|decimal|texto|vof|array', //tipos de variables
+        condition: 'correcto|incorrecto|sino', // palabaras paraa condicionales
+        bucleFor: 'recorre', //palabra para bucle for
+        for: 'hasta',// continuacion del blucle for
+        bucleWhile:'mientras', //blucle mientras
+        show: 'muestra', // print|log
+        read: 'oye', //lectura de datos
+        this: 'este', // palabra reservada this
         try: 'intenta',
         catch: 'fallo',
         like: 'como',

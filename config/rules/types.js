@@ -2,7 +2,7 @@
  *   Configuracion de la forma de las variables para el lenguaje "SIMPLE"
  *  lacconfiguracion esta realizada con expresiones regulares-comunes
  */
-const descrip = require('./description').rules;
+const descrip = require('./description');
 
 const types = {
         name: `\\b${descrip.alp}${descrip.alpnum}*\\b`,
@@ -15,5 +15,5 @@ const types = {
 
 module.exports = {
         types,
-        re: `${types.name}|${types.num}|${types.decimal}|${types.texto}|${types.vof}`
+        any: `${types.name}|${types.num}|${types.decimal}|${types.texto}|${types.vof}`
 };
