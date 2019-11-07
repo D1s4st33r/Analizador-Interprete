@@ -11,9 +11,9 @@ const word = {
         bucleWhile:'mientras', //blucle mientras
         show: 'muestra', // print|log
         read: 'oye', //lectura de datos
-        this: 'este', // palabra reservada this
-        try: 'intenta',
-        catch: 'fallo',
+        // this: 'este', // palabra reservada this
+        // try: 'intenta',
+        // catch: 'fallo',
         like: 'como',
         ini: 'Ini',
         end: 'Termi',

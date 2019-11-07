@@ -14,7 +14,7 @@ const manager = {
 	},
 	getContentArray: () => this.lines,
 	getContent: () => this.content,
-	getPath: ()=> this.path
+	getPath: () => this.path
 }
 
 module.exports = manager;

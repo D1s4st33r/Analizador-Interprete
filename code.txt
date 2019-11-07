@@ -1,31 +1,8 @@
 Ini<
 
-como array perico!
-como num fer !
+    como array perico!
+    como num fer!
 como text nombre!
 como vof mayor!
 
-nombre -> oye("ingresa tu nombre")!
-apellido -> oye("ingresa tu apellido")!
-edad -> oye("ingresa tu edad")!
-correcto(edad < 15){
-	menor -> verdad!
-	muestra('eres menor de edad')!
-}
-
-incorrecto(nombre==null o nombre=='' y menor){
-	recorre(cen hasta 5)
-	{
-		numeros -> oye('ingresa un numero')!
-	}
-	muestra(numeros)
-	saludar(nombre,edad)!
-}
-sino
-{
-muestra("no ingresaste los datos bye")!
-}
-
-accion saludar->(name){ muestra("hola "+nombre+", eres mayor de edad")!}
-
-
+>Termi

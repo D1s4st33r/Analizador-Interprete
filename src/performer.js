@@ -2,19 +2,18 @@
  * Clase que se encargara de interpretar y ejecutar el codigo ya analizado
  */
 
-const syntax = require('../config/rules/syntax').syntax;
+const syntax = require('../config/rules/syntax');
 
 
-let iniIsFirst= false;			 //bandera para la estructura general, palabra reservada ini
-let termiIsLast = false;		    //bandera para la estrucura general, palabra reservada 
-let errores = [];				// array que almacena los errores en un objeto individual
+let iniIsFirst = false;			//bandera para la estructura general, palabra reservada ini
+let termiIsLast = false;		//bandera para la estrucura general, palabra reservada 
 let first = true;				//bandera, determina que es la primera linea de codigo
 let listVar = [];				//array que almacena las variables en forma de objeto
 let type = '';					//el tipo define que reglas son, de palabra reservada, caracter o variable
 let varsToMake = [];			//array que almacena las variables a crear
-let parOpen = [];			  //array de banderas para verificar el cerrado correcto de parentesis
-let keyOpen = [];			  //array de banderas para verificar el cerrado correcto de llaves	
-let pilaCases = [];			   //array que sera tratado como pila de de los casos
+let parOpen = [];			  	//array de banderas para verificar el cerrado correcto de parentesis
+let keyOpen = [];			  	//array de banderas para verificar el cerrado correcto de llaves	
+let pilaCases = [];			   	//array que sera tratado como pila de de los casos
 let lastCase = 0;
 
 
@@ -22,16 +21,15 @@ let lastCase = 0;
 const makeObjCase = (nameCase, struct, flags) => {
 	
 	let object = {
-		nameCase,
+		nameCase,			//almacena un nombre de caso 
 		struct,				//almacena la estuctura de una sintaxis	
-		flags,					// un array  de booleanos que su numero dependera de la sintaxis que se este validando
-		numFlag: 0,				//varaible centinela que llevara el numero de banderas para recorrerlo
-		limit:flags.length,		//variable que alamecena el numero limite de bandera
-		varInUse:[] ,			    //determina la variable en uso
+		flags,				// un array  de booleanos que su numero dependera de la sintaxis que se este validando
+		numFlag: 0,			//varaible centinela que llevara el numero de banderas para recorrerlo
+		limit:flags.length,	//variable que alamecena el numero limite de bandera
+		varInUse:[] ,		//determina la variable en uso
 		result: 0,			//determina los valores actuales y los resultados finales 
 	};
-	//console.log(object);
-	//console.log('\n');
+
 	return object;
 }
 
@@ -53,11 +51,12 @@ const makeFlags = (num) => {
 	return array;
 };
 
+//Funcion para preparar variables a guardar
 const prepareVars = (name,type) => {
 	let variable = {
-		 name,
-		 type,
-		//  value
+		name,
+		type,
+		value: false
 	};
 
 	varsToMake.push(variable);
@@ -69,7 +68,6 @@ const makeVars = (vars) => {
 
 	vars.forEach(element => {
 		listVar.push(element);
-		insertVar();
 		// return tarea;
 	});
 }
@@ -90,6 +88,7 @@ const makeVars = (vars) => {
 // 	}
 // }
 
+//obejeto que contiene las acciones que interpretara el codigo analizado
 const performer = {
 	
 	// funcion para determinar la sintaxis que se validara dependiendo de la palabra reservada encontrada
@@ -130,14 +129,11 @@ const performer = {
 				console.log('no debia aparecer : ' + caso);
 				break;	
 		}
-		//console.log(pilaCases);
-		// pilaCases=[]
+
 		if (first && caso == 'ini') {
 			iniIsFirst = true;
 		}
-		else {
-			first = false;
-		}
+		if(first) first=false;
 	},
 	// funcion para determinar la sintaxis que se validara dependiendo de la palabra reservada encontrada
 	isChar: (caso) => {
@@ -150,60 +146,49 @@ const performer = {
 				//console.log('soy -');
 				break;
 			case 'sig':
-				//console.log('soy >');
+				//('soy >');
 				break;
 			case 'leftKey':
-				//console.log('soy {');
+				//('soy {');
 				break;
 			case 'rightKey':
-				//console.log('soy }');
+				//('soy }');
 				break;
 			case 'leftPar':
-				//console.log('soy (');
+				//('soy (');
 				break;
 			case 'rightPar':
-				//console.log('soy )');
+				//('soy )');
 				break;
 			case 'com':
-				//console.log('soy "');
+				//('soy "');
 				break;
 			case 'comSim':
-				//console.log("soy '");
+				//("soy '");
 				break;
 			default:
 				console.log('mmmta :v');
 				break;
 		}
 
-		if (first) {
-			first = false;
-		}
+		if (first) first = false;
 	},
 
 	// funcion para manejar la variable, si se esta declarando o si se esta usando y su manejo de errores
-	varCase: (token, lastToken, line) => {
+	varCase: (token, type) => {
 
-		let regEx = new RegExp('\\bnum\\b|decimal|texto|vof|array');
-		listVar.forEach(variable => {
-			if (variable.name == token&&pilaCases.length>0) {
-				pilaCases[lastCase].varInUse.push(variable)
-			}	
-		});
-
-		if(lastToken.match(regEx)){type=lastToken}
-
-		if (pilaCases.length>0&& pilaCases[lastCase].nameCase=='like') {
-			prepareVars(token, type);
-		}
-		
-		errores.push({
-			tipo: 'undefined',
-			message: `la variable ${token} no se ha definido`,
-			line
-		});
-
-		if (first) {
-			first = false;
+		if(pilaCases.length > 0) {
+			if(pilaCases[lastCase].name == 'like') {
+				prepareVars(token, type);
+			} else {
+				listVar.forEach(variable => {
+					if (variable.name == token&&pilaCases.length>0) {
+						pilaCases[lastCase].varInUse.push(variable)
+					}
+				});
+			}
+		} else {
+			pilaCases.push(makeObjCase('assig',syntax.assig,makeFlags(syntax.assig.length)))
 		}
 	},
 
@@ -212,31 +197,34 @@ const performer = {
 		
 		if (pilaCases.length>0) {
 			lastCase = pilaCases.length - 1;
-			console.log("\n");
-			// console.log(pilaCases);
-			if (token.match(new RegExp(pilaCases[lastCase].struct[pilaCases[lastCase].numFlag]))) {
-				pilaCases[lastCase].flags[pilaCases[lastCase].numFlag] = true;
+			let caso = pilaCases[lastCase];
+	
+			if (token.match(new RegExp(caso.struct[caso.numFlag]))) {
+				caso.flags[caso.numFlag] = true;
 			}
 			else {
-				console.log(`no se encuentra el elemento ${pilaCases[lastCase].struct[pilaCases[lastCase].numFlag]} en la linea : ${line}`);
+				console.error('Error de syntaxis:')
+				console.log(`no se encuentra el elemento ${caso.struct[caso.numFlag]} en la linea : ${line}`);
 			}
 			if (pilaCases[lastCase].numFlag < pilaCases[lastCase].limit) { pilaCases[lastCase].numFlag++; }
-			console.log('::::::::::::::::::::::::' + token);
+
+			console.log(`::::: ${token} ::::: `);
 			console.log(pilaCases[lastCase]);
-			console.log("//////////////////////////////////////////////////////////////////////////////");
+			console.log("----------------------");
 
 		}
 	},
 	
 	status: () => {
 
-		
+		console.log('***** EVIDENCIA *****');
+		console.log(pilaCases[lastCase]);
+
 		if (pilaCases[lastCase].numFlag == pilaCases[lastCase].limit) {
 				
 			if (checkCase(lastCase)) {
 				return true;
 			} 
-			console.log(`PRUEBA: ${pilaCases[lastCase]}`);
 		}
 		return false;
 	},

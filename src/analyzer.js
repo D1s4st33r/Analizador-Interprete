@@ -20,7 +20,7 @@ const analyzer = {
 		return false;
 	},
 
-	//funcion para validar si un token que es caracter  reservado
+	//funcion para validar si el token es caracter  reservado
 	isRChar : (element) => {
 		for (const key in chars) {
 			let regEx = new RegExp(chars[key]);
@@ -31,6 +31,7 @@ const analyzer = {
 		return false;
 	},
 
+	//Funcion que determina si un token ya se declaro como variable
 	isVar: (element) => {
 		let regEx = new RegExp(types.name);
 		if (element.match(regEx)) {
